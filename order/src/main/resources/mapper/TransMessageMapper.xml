@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.minjiang.order.moddymq.mapper.TransMessageMapper">
+
+    <resultMap id="BaseResultMap" type="com.minjiang.order.moddymq.pojo.TransMessage">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <id property="service" column="service" jdbcType="VARCHAR"/>
+            <result property="type" column="type" jdbcType="VARCHAR"/>
+            <result property="exchange" column="exchange" jdbcType="VARCHAR"/>
+            <result property="routingkey" column="routingKey" jdbcType="VARCHAR"/>
+            <result property="queue" column="queue" jdbcType="VARCHAR"/>
+            <result property="sequence" column="sequence" jdbcType="INTEGER"/>
+            <result property="payload" column="payload" jdbcType="VARCHAR"/>
+            <result property="date" column="date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,service,type,
+        exchange,routingKey,queue,
+        sequence,payload,date
+    </sql>
+</mapper>

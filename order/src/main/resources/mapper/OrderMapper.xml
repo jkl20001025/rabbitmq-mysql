@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.minjiang.order.mapper.OrderMapper">
+
+    <resultMap id="BaseResultMap" type="com.minjiang.order.pojo.po.Order">
+            <id property="id" column="id" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="VARCHAR"/>
+            <result property="address" column="address" jdbcType="VARCHAR"/>
+            <result property="accountId" column="account_id" jdbcType="VARCHAR"/>
+            <result property="productId" column="product_id" jdbcType="VARCHAR"/>
+            <result property="deliverymanId" column="deliveryman_id" jdbcType="VARCHAR"/>
+            <result property="settlementId" column="settlement_id" jdbcType="VARCHAR"/>
+            <result property="rewardId" column="reward_id" jdbcType="VARCHAR"/>
+            <result property="price" column="price" jdbcType="DECIMAL"/>
+            <result property="date" column="date" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,status,address,
+        account_id,product_id,deliveryman_id,
+        settlement_id,reward_id,price,
+        date
+    </sql>
+</mapper>

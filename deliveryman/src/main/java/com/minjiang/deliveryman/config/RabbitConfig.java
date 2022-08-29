@@ -1,0 +1,63 @@
+package com.minjiang.deliveryman.config;
+
+
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.RabbitListenerContainerFactory;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class RabbitConfig {
+    @Autowired
+    private RabbitProperties properties;
+
+    public static final String DELIVERYMAN_QUEUE="queue.deliveryman";
+    public static final String DELIVERYMAN_EXCHANGE = "exchange.order.deliveryman";         //骑手交换机
+    public static final String DELIVERYMAN_ROUTING_KEY="key.deliveryman";
+    /*RabbitMQ连接池，从配置文件读取参数*/
+    @Bean
+    public ConnectionFactory connectionFactory(){
+        CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory();
+        cachingConnectionFactory.setHost(properties.getHost());
+        cachingConnectionFactory.setPort(properties.getPort());
+        cachingConnectionFactory.setUsername(properties.getUsername());
+        cachingConnectionFactory.setPassword(properties.getPassword());
+        cachingConnectionFactory.setVirtualHost(properties.getVirtualHost());
+        cachingConnectionFactory.setPublisherReturns(properties.isPublisherReturns());                          //开启连接池的ReturnCallBack支持
+        cachingConnectionFactory.setPublisherConfirmType(CachingConnectionFactory.ConfirmType.CORRELATED);      //开启连接池的Publisher-confirm-type支持
+        return cachingConnectionFactory;
+    }
+
+
+    /* RabbitListener使用连接池，使用连接池时 spring.rabbitmq.listener.simple 配置不生效 */
+    @Bean
+    public RabbitListenerContainerFactory rabbitListenerContainerFactory(ConnectionFactory connectionFactory){
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setAcknowledgeMode(AcknowledgeMode.MANUAL);         //关闭自动ACK
+        factory.setConnectionFactory(connectionFactory);            //使用连接池
+        factory.setPrefetchCount(1);                                //设置QOS
+        factory.setMessageConverter(new Jackson2JsonMessageConverter());        //设置消息转换器为JSON
+        return factory;
+    }
+//    声明队列和交换机，并绑定
+    @Bean
+    public DirectExchange deliverymanExchange(){
+        return ExchangeBuilder.directExchange(DELIVERYMAN_EXCHANGE).durable(true).build();
+    }
+    @Bean
+    public Queue deliverymanQueue(){
+        return QueueBuilder.durable(DELIVERYMAN_QUEUE).build();
+    }
+    @Bean
+    public Binding deliverymanBinding(@Qualifier("deliverymanExchange") DirectExchange exchange,
+                                      @Qualifier("deliverymanQueue")Queue queue){
+        return BindingBuilder.bind(queue).to(exchange).with(DELIVERYMAN_ROUTING_KEY);
+    }
+}
